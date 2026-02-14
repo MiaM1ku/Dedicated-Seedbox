@@ -41,6 +41,17 @@ if [ $(id -u) -ne 0 ]; then
     fail_exit "This script needs root permission to run"
 fi
 
+# Pre-process long options
+for arg in "$@"; do
+    case "$arg" in
+        --nocheck-os)
+            nocheck_os=1
+            # 从参数列表中移除该参数，避免 getopts 报错
+            set -- "${@/--nocheck-os/}"
+            ;;
+    esac
+done
+
 # Linux Distro Version check
 if [ -f /etc/os-release ]; then
 	. /etc/os-release
@@ -91,16 +102,6 @@ if [[ -z "$nocheck_os" ]] && [[ "$OS" =~ "Ubuntu" ]]; then
 fi
 
 
-# Pre-process long options
-for arg in "$@"; do
-    case "$arg" in
-        --nocheck-os)
-            nocheck_os=1
-            # 从参数列表中移除该参数，避免 getopts 报错
-            set -- "${@/--nocheck-os/}"
-            ;;
-    esac
-done
 
 
 ## Read input arguments
