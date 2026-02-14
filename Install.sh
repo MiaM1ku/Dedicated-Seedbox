@@ -65,27 +65,43 @@ else
 	VER=$(uname -r)
 fi
 
-if [[ ! "$OS" =~ "Debian" ]] && [[ ! "$OS" =~ "Ubuntu" ]]; then	#Only Debian and Ubuntu are supported
-	fail "$OS $VER is not supported"
-	info "Only Debian 10+ and Ubuntu 20.04+ are supported"
-	exit 1
+if [[ -z "$nocheck_os" ]]; then
+    if [[ ! "$OS" =~ "Debian" ]] && [[ ! "$OS" =~ "Ubuntu" ]]; then
+        fail "$OS $VER is not supported"
+        info "Only Debian 10+ and Ubuntu 20.04+ are supported"
+        exit 1
+    fi
 fi
 
-if [[ "$OS" =~ "Debian" ]]; then	#Debian 10+ are supported
-	if [[ ! "$VER" =~ "10" ]] && [[ ! "$VER" =~ "11" ]] && [[ ! "$VER" =~ "12" ]]; then
-		fail "$OS $VER is not supported"
-		info "Only Debian 10+ are supported"
-		exit 1
-	fi
+
+if [[ -z "$nocheck_os" ]] && [[ "$OS" =~ "Debian" ]]; then
+    if [[ ! "$VER" =~ "10" ]] && [[ ! "$VER" =~ "11" ]] && [[ ! "$VER" =~ "12" ]]; then
+        fail "$OS $VER is not supported"
+        info "Only Debian 10+ are supported"
+        exit 1
+    fi
 fi
 
-if [[ "$OS" =~ "Ubuntu" ]]; then #Ubuntu 20.04+ are supported
-	if [[ ! "$VER" =~ "20" ]] && [[ ! "$VER" =~ "22" ]] && [[ ! "$VER" =~ "23" ]]; then
-		fail "$OS $VER is not supported"
-		info "Only Ubuntu 20.04+ is supported"
-		exit 1
-	fi
+if [[ -z "$nocheck_os" ]] && [[ "$OS" =~ "Ubuntu" ]]; then
+    if [[ ! "$VER" =~ "20" ]] && [[ ! "$VER" =~ "22" ]] && [[ ! "$VER" =~ "23" ]]; then
+        fail "$OS $VER is not supported"
+        info "Only Ubuntu 20.04+ is supported"
+        exit 1
+    fi
 fi
+
+
+# Pre-process long options
+for arg in "$@"; do
+    case "$arg" in
+        --nocheck-os)
+            nocheck_os=1
+            # 从参数列表中移除该参数，避免 getopts 报错
+            set -- "${@/--nocheck-os/}"
+            ;;
+    esac
+done
+
 
 ## Read input arguments
 while getopts "u:p:c:q:l:rbvx3oh" opt; do
@@ -223,11 +239,12 @@ while getopts "u:p:c:q:l:rbvx3oh" opt; do
 		need_input "10. -3 : Install BBRv3"
 		need_input "11. -p : Specify ports for qBittorrent, autobrr and vertex"
 		need_input "12. -h : Display help message"
+		need_input "13. --nocheck-os : Skip OS version check"
 		exit 0
 		;;
 	\? ) 
 		info "Help:"
-		info_2 "Usage: ./Install.sh -u <username> -p <password> -c <Cache Size(unit:MiB)> -q <qBittorrent version> -l <libtorrent version> -b -v -r -3 -x -p"
+		info_2 "Usage: ./Install.sh -u <username> -p <password> -c <Cache Size(unit:MiB)> -q <qBittorrent version> -l <libtorrent version> -b -v -r -3 -x -p --nocheck-os"
 		info_2 "Example ./Install.sh -u jerry048 -p 1LDw39VOgors -c 3072 -q 4.3.9 -l v1.2.19 -b -v -r -3"
 		exit 1
 		;;
