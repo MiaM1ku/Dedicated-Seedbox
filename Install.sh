@@ -94,7 +94,7 @@ if [[ -z "$nocheck_os" ]] && [[ "$OS" =~ "Debian" ]]; then
 fi
 
 if [[ -z "$nocheck_os" ]] && [[ "$OS" =~ "Ubuntu" ]]; then
-    if [[ ! "$VER" =~ "20" ]] && [[ ! "$VER" =~ "22" ]] && [[ ! "$VER" =~ "23" ]]; then
+    if [[ ! "$VER" =~ "20" ]] && [[ ! "$VER" =~ "22" ]] && [[ ! "$VER" =~ "23" ]] && [[ ! "$VER" =~ "24" ]]; then
         fail "$OS $VER is not supported"
         info "Only Ubuntu 20.04+ is supported"
         exit 1
